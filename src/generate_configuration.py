@@ -2,11 +2,16 @@ import sys
 import getopt
 import os
 import json
+import argparse
+from pathlib import Path
 
 
 pi = 3.14159
 d2r = pi / 180
 r2d = 180 / pi
+
+base_dir = ".." if Path.cwd().name == "src" else "."
+config_dir = "." if Path.cwd().name == "src" else "src"
 
 shape_config = {
 
@@ -449,33 +454,34 @@ shape_config = {
     ## END CONFIGURATION SECTION
     ####################################
 
-def save_config():
-    # Check to see if the user has specified an alternate config
-    opts, args = getopt.getopt(sys.argv[1:], "", ["config=", "update="])
+def save_config(args):
     got_opts = False
-    for opt, arg in opts:
-        if opt in ('--update'):
-            with open(os.path.join(r"..", "configs", arg + '.json'), mode='r') as fid:
-                data = json.load(fid)
-                shape_config.update(data)
-            got_opts = True
+    if args.update:
+        with open(os.path.join(base_dir, "configs", f"{args.update}.json"), mode='r') as fid:
+            data = json.load(fid)
+            print (data)
+            shape_config.update(data)
+        got_opts = True
 
-    for opt, arg in opts:
-        if opt in ('--config'):
-            # If a config file was specified, set the config_name and save_dir
-            shape_config['save_dir'] = arg
-            shape_config['config_name'] = arg
-            got_opts = True
+    if args.config:
+        # If a config file was specified, set the config_name and save_dir
+        shape_config['save_dir'] = args.config
+        shape_config['config_name'] = args.config
+        got_opts = True
 
     # Write the config to ./configs/<config_name>.json
     if got_opts:
-        with open(os.path.join(r"..", "configs", shape_config['config_name'] + '.json'), mode='w') as fid:
+        with open(os.path.join(base_dir, "configs", f"{shape_config['config_name']}.json"), mode='w') as fid:
             json.dump(shape_config, fid, indent=4)
 
     else:
-        with open(os.path.join(r".", 'run_config.json'), mode='w') as fid:
+        with open(os.path.join(config_dir, 'run_config.json'), mode='w') as fid:
             json.dump(shape_config, fid, indent=4)
 
 
 if __name__ == '__main__':
-    save_config()
+    parser = argparse.ArgumentParser(prog="Config Generator", description="Generates config for DM")
+    parser.add_argument("-c", "--config", dest="config", help="generate a named config file")
+    parser.add_argument("-U", "--update", dest="update", help="update an existing config file")
+    args = parser.parse_args()
+    save_config(args)
