@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import time
+import logging
 
 import numpy as np
 from numpy import pi
@@ -50,30 +51,18 @@ def get_git_info():
     # except FileNotFoundError:
     #     log("No git repository found.", "ERROR")
     #     return None
-
-def deg2rad(degrees: float) -> float:
-    return degrees * pi / 180
-
-
-def rad2deg(rad: float) -> float:
-    return rad * 180 / pi
-
-
 debug_exports = False
 debug_trace = False
 
+logging.basicConfig(level=os.environ.get("LOG_LEVEL",logging.INFO))
+logger = logging.getLogger()
 
-def debugprint(info):
-    if debug_trace:
-        print(info)
 
 ###############################################
 # EXTREMELY UGLY BUT FUNCTIONAL BOOTSTRAP
 ###############################################
 
 ## IMPORT DEFAULT CONFIG IN CASE NEW PARAMETERS EXIST
-
-
 
 def make_dactyl(args):
     def is_side(side, param):
@@ -163,28 +152,28 @@ def make_dactyl(args):
         with open(os.path.join(r".", "configs", args.config + '.json'), mode='r') as fid:
             data = json.load(fid)
     if args.output:
-        print("save_path set to argument: ", args.output)
+        logger.info(f"save_path set to argument: {args.output}")
         save_path = args.output
     if args.overrides:
-        print("overrides set to: ", args.overrides)
+        logger.info(f"overrides set to: {args.overrides}")
         overrides_name = args.overrides
 
     if data is None:
-        print(f">>> Using config run_config.json on Git branch {local_branch}")
+        logger.info(f">>> Using config run_config.json on Git branch {local_branch}")
         data = load_json(os.path.join("src", "run_config.json"), None, save_path)
         # with open(os.path.join("src", "run_config.json"), mode='r') as fid:
         #     data = json.load(fid)
 
     if data["overrides"] not in [None, ""]:
         if overrides_name != "":
-            print("YO! overrides param set in run_config.json AND in command line 'overrides' argument! Can't compute!")
+            logger.error("YO! overrides param set in run_config.json AND in command line 'overrides' argument! Can't compute!")
             sys.exit(99)
         overrides_name = data["overrides"]
 
         # for item in override_data:
         #     data[item] = override_data[item]
     if overrides_name != "":
-        print(f"Importing config overrides for: {overrides_name}")
+        logger.info(f"Importing config overrides for: {overrides_name}")
         save_path = path.join(save_path, overrides_name)
         override_file = path.join(save_path, overrides_name + '.json')
         with open(override_file, mode='r') as fid:
@@ -193,10 +182,10 @@ def make_dactyl(args):
     try:
         if data["branch"] not in ["", None]:
             if data["branch"] != local_branch:
-                print(f"INCORRECT GIT BRANCH! Local is {local_branch} but config requires {data['branch']}.  Exiting.")
+                logger.error(f"INCORRECT GIT BRANCH! Local is {local_branch} but config requires {data['branch']}.  Exiting.")
                 sys.exit(101)
     except Exception:
-        print("No 'branch' param found on config.")
+        logger.warn("No 'branch' param found on config.")
 
     settings.update(data)
 
@@ -212,18 +201,18 @@ def make_dactyl(args):
     ENGINE = data["ENGINE"]
     # Really rough setup.  Check for ENGINE, set it not present from configuration.
     try:
-        print('Found Current Engine in Config = {}'.format(ENGINE))
+        logger.info(f'Found Current Engine in Config = {ENGINE}')
     except Exception:
-        print('Engine Not Found in Config')
+        logger.warn('Engine Not Found in Config')
         ENGINE = 'solid'
         # ENGINE = 'cadquery'
-        print('Setting Current Engine = {}'.format(ENGINE))
+        logger.info(f'Setting Current Engine = {ENGINE}')
 
     parts_path = os.path.abspath(path.join(r"src", "parts"))
 
     if settings["save_dir"] not in ['', None, '.']:
         save_path = settings["save_dir"]
-        print("save_path set to save_dir json setting: ", save_path)
+        logger.info(f"save_path set to save_dir json setting: {save_path}")
             # parts_path = path.join(r"..", r"..", "src", "parts")
         # parts_path = path.join(r"..", r"..", "src", "parts")
 
@@ -557,7 +546,7 @@ def make_dactyl(args):
             pw2 = 11
 
         else: # same as Usize == 1; removes possibly unbound error
-            print ("CAP SIZE NOT STANDARD, size must be set to: 1, 1.25, 1.5, 2")
+            logger.error ("CAP SIZE NOT STANDARD, size must be set to: 1, 1.25, 1.5, 2")
             exit(88)
         k1 = helpers.polyline([(bw2, bl2), (bw2, -bl2), (-bw2, -bl2), (-bw2, bl2), (bw2, bl2)])
         k1 = helpers.extrude_poly(outer_poly=k1, height=0.1)
@@ -603,7 +592,7 @@ def make_dactyl(args):
 
 
     def rotate_around_x(position, angle):
-        # debugprint('rotate_around_x()')
+        # logger.debug('rotate_around_x()')
         t_matrix = np.array(
             [
                 [1, 0, 0],
@@ -615,7 +604,7 @@ def make_dactyl(args):
 
 
     def rotate_around_y(position, angle):
-        # debugprint('rotate_around_y()')
+        # logger.debug('rotate_around_y()')
         t_matrix = np.array(
             [
                 [np.cos(angle), 0, np.sin(angle)],
@@ -635,7 +624,7 @@ def make_dactyl(args):
             row,
             column_style=column_style,
     ):
-        debugprint('apply_key_geometry()')
+        logger.debug('apply_key_geometry()')
 
         column_angle = settings["beta"] * (settings["centercol"] - column)
 
@@ -706,22 +695,22 @@ def make_dactyl(args):
         return row <= bottom_key(column)
 
     def x_rot(shape, angle):
-        # debugprint('x_rot()')
-        return helpers.rotate(shape, [rad2deg(angle), 0, 0])
+        # logger.debug('x_rot()')
+        return helpers.rotate(shape, [np.rad2deg(angle), 0, 0])
 
 
     def y_rot(shape, angle):
-        # debugprint('y_rot()')
-        return helpers.rotate(shape, [0, rad2deg(angle), 0])
+        # logger.debug('y_rot()')
+        return helpers.rotate(shape, [0, np.rad2deg(angle), 0])
 
 
     def key_place(shape, column, row):
-        debugprint('key_place()')
+        logger.debug('key_place()')
         return apply_key_geometry(shape, helpers.translate, x_rot, y_rot, column, row)
 
 
     def cluster_key_place(shape, column, row):
-        debugprint('key_place()')
+        logger.debug('key_place()')
         c = col(column)
         # if c < 0:
         #     c = 0
@@ -730,7 +719,7 @@ def make_dactyl(args):
         # c = column if not inner_column else column + 1
         return apply_key_geometry(shape, settings["translate"], x_rot, y_rot, c, row)
     def add_translate(shape, xyz):
-        debugprint('add_translate()')
+        logger.debug('add_translate()')
         vals = []
         for i in range(len(shape)):
             vals.append(shape[i] + xyz[i])
@@ -738,14 +727,14 @@ def make_dactyl(args):
 
 
     def key_position(position, column, row):
-        debugprint('key_position()')
+        logger.debug('key_position()')
         return apply_key_geometry(
             position, add_translate, rotate_around_x, rotate_around_y, column, row
         )
 
 
     def key_holes(side="right"):
-        debugprint('key_holes()')
+        logger.debug('key_holes()')
         # hole = single_plate()
         holes = []
         for column in range(settings["ncols"]):
@@ -781,7 +770,7 @@ def make_dactyl(args):
 
 
     def web_post():
-        debugprint('web_post()')
+        logger.debug('web_post()')
         post = helpers.box(settings["post_size"], settings["post_size"], settings["web_thickness"])
         post = helpers.translate(post, (0, 0, settings["plate_thickness"] - (settings["web_thickness"] / 2)))
         return post
@@ -814,7 +803,7 @@ def make_dactyl(args):
 
 
     def connectors():
-        debugprint('connectors()')
+        logger.debug('connectors()')
         hulls = []
         for column in range(settings["ncols"] - 1):
             torow = get_torow(column)
@@ -869,7 +858,7 @@ def make_dactyl(args):
 
 
     def adjustable_plate_half(Usize=1.5):
-        debugprint('double_plate()')
+        logger.debug('double_plate()')
         adjustable_plate_height = adjustable_plate_size(Usize)
         top_plate = helpers.box(mount_width, adjustable_plate_height, settings["web_thickness"])
         top_plate = helpers.translate(top_plate,
@@ -879,13 +868,13 @@ def make_dactyl(args):
 
 
     def adjustable_plate(Usize=1.5):
-        debugprint('double_plate()')
+        logger.debug('double_plate()')
         top_plate = adjustable_plate_half(Usize)
         return helpers.union((top_plate, helpers.mirror(top_plate, 'XZ')))
 
 
     def double_plate_half():
-        debugprint('double_plate()')
+        logger.debug('double_plate()')
         top_plate = helpers.box(mount_width, double_plate_height, settings["web_thickness"])
         top_plate = helpers.translate(top_plate,
                               [0, (double_plate_height + mount_height) / 2, settings["plate_thickness"] - (settings["web_thickness"] / 2)]
@@ -894,7 +883,7 @@ def make_dactyl(args):
 
 
     def double_plate():
-        debugprint('double_plate()')
+        logger.debug('double_plate()')
         top_plate = double_plate_half()
         return helpers.union((top_plate, helpers.mirror(top_plate, 'XZ')))
 
@@ -931,7 +920,7 @@ def make_dactyl(args):
     ##########
 
     def left_key_position(row, direction, low_corner=False, side='right'):
-        debugprint("left_key_position()")
+        logger.debug("left_key_position()")
         pos = np.array(
             key_position([-mount_width * 0.5, direction * mount_height * 0.5, 0], 0, row)
         )
@@ -964,7 +953,7 @@ def make_dactyl(args):
 
 
     def left_key_place(shape, row, direction, low_corner=False, side='right'):
-        debugprint("left_key_place()")
+        logger.debug("left_key_place()")
         if row > bottom_key(0):
             row = bottom_key(0)
         pos = left_key_position(row, direction, low_corner=low_corner, side=side)
@@ -978,17 +967,17 @@ def make_dactyl(args):
         return left_key_place(shape, row, direction, low_corner, side)
 
     def wall_locate1(dx, dy):
-        debugprint("wall_locate1()")
+        logger.debug("wall_locate1()")
         return [dx * settings["wall_thickness"], dy * settings["wall_thickness"], -1]
 
 
     def wall_locate2(dx, dy):
-        debugprint("wall_locate2()")
+        logger.debug("wall_locate2()")
         return [dx * settings["wall_x_offset"], dy * settings["wall_y_offset"], -settings["wall_z_offset"]]
 
 
     def wall_locate3(dx, dy, back=False):
-        debugprint("wall_locate3()")
+        logger.debug("wall_locate3()")
         if back:
             return [
                 dx * (settings["wall_x_offset"] + settings["wall_base_x_thickness"]),
@@ -1009,7 +998,7 @@ def make_dactyl(args):
 
 
     def wall_brace(place1, dx1, dy1, post1, place2, dx2, dy2, post2, back=False):
-        debugprint("wall_brace()")
+        logger.debug("wall_brace()")
         hulls = []
 
         hulls.append(place1(post1))
@@ -1036,7 +1025,7 @@ def make_dactyl(args):
 
 
     def key_wall_brace(x1, y1, dx1, dy1, post1, x2, y2, dx2, dy2, post2, back=False):
-        debugprint("key_wall_brace()")
+        logger.debug("key_wall_brace()")
         return wall_brace(
             (lambda shape: key_place(shape, x1, y1)),
             dx1,
@@ -1220,14 +1209,14 @@ def make_dactyl(args):
 
 
     def rj9_cube():
-        debugprint('rj9_cube()')
+        logger.debug('rj9_cube()')
         shape = helpers.box(14.78, 13, 22.38)
 
         return shape
 
 
     def rj9_space():
-        debugprint('rj9_space()')
+        logger.debug('rj9_space()')
         return helpers.translate(rj9_cube(), rj9_position)
 
 
@@ -1265,7 +1254,7 @@ def make_dactyl(args):
 
 
     def usb_holder_hole():
-        debugprint('usb_holder_hole()')
+        logger.debug('usb_holder_hole()')
         shape = helpers.box(*usb_holder_size)
         shape = helpers.translate(shape,
                           (
@@ -1338,7 +1327,7 @@ def make_dactyl(args):
         return helpers.union([shape, cyl1, cyl2])
 
     def usb_c_hole():
-        debugprint('usb_c_hole()')
+        logger.debug('usb_c_hole()')
         return usb_c_shape(settings["usb_c_width"], settings["usb_c_height"], 20)
 
     def usb_c_mount_point():
@@ -1549,7 +1538,7 @@ def make_dactyl(args):
 
         angle_x = np.arctan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1])
         angle_z = np.arctan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1])
-        tbiw_mount_rotation_xyz = (rad2deg(angle_x), 0, rad2deg(angle_z)) + np.array(settings["tbiw_rotation_offset"])
+        tbiw_mount_rotation_xyz = (np.rad2deg(angle_x), 0, np.rad2deg(angle_z)) + np.array(settings["tbiw_rotation_offset"])
 
         return tbiw_mount_location_xyz, tbiw_mount_rotation_xyz
 
@@ -1597,13 +1586,13 @@ def make_dactyl(args):
             angle_x = np.arctan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1])
             angle_z = np.arctan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1])
             if settings["oled_horizontal"]:
-                oled_mount_rotation_xyz = (0, rad2deg(angle_x), -100) + np.array(_oled_rotation_offset)
+                oled_mount_rotation_xyz = (0, np.rad2deg(angle_x), -100) + np.array(_oled_rotation_offset)
             elif settings["trackball_in_wall"] and is_side(side, settings["ball_side"]):
-                # oled_mount_rotation_xyz = (0, rad2deg(angle_x), -rad2deg(angle_z)-90) + np.array(oled_rotation_offset)
-                # oled_mount_rotation_xyz = (rad2deg(angle_x)*.707, rad2deg(angle_x)*.707, -45) + np.array(oled_rotation_offset)
-                oled_mount_rotation_xyz = (0, rad2deg(angle_x), -100) + np.array(_oled_rotation_offset)
+                # oled_mount_rotation_xyz = (0, np.rad2deg(angle_x), -np.rad2deg(angle_z)-90) + np.array(oled_rotation_offset)
+                # oled_mount_rotation_xyz = (np.rad2deg(angle_x)*.707, np.rad2deg(angle_x)*.707, -45) + np.array(oled_rotation_offset)
+                oled_mount_rotation_xyz = (0, np.rad2deg(angle_x), -100) + np.array(_oled_rotation_offset)
             else:
-                oled_mount_rotation_xyz = (rad2deg(angle_x), 0, -rad2deg(angle_z)) + np.array(_oled_rotation_offset)
+                oled_mount_rotation_xyz = (np.rad2deg(angle_x), 0, -np.rad2deg(angle_z)) + np.array(_oled_rotation_offset)
 
         return oled_mount_location_xyz, oled_mount_rotation_xyz
 
@@ -1933,7 +1922,7 @@ def make_dactyl(args):
 
 
     def screw_insert_shape(bottom_radius, top_radius, height, hole=False):
-        debugprint('screw_insert_shape()')
+        logger.debug('screw_insert_shape()')
         mag_offset = 0
         new_height = height
         if hole:
@@ -1962,7 +1951,7 @@ def make_dactyl(args):
         return shape
 
     def screw_insert(column, row, bottom_radius, top_radius, height, side='right', hole=False):
-        debugprint('screw_insert()')
+        logger.debug('screw_insert()')
         position = screw_position(column, row, side)
         shape = screw_insert_shape(bottom_radius, top_radius, height, hole=hole)
         shape = helpers.translate(shape, [position[0], position[1], height / 2])
@@ -1970,28 +1959,28 @@ def make_dactyl(args):
         return shape
 
     def screw_position(column, row,  side='right'):
-        debugprint('screw_position()')
+        logger.debug('screw_position()')
         shift_right = column == lastcol
         shift_left = column == 0
         shift_up = (not (shift_right or shift_left)) and (row == 0)
         shift_down = (not (shift_right or shift_left)) and (row >= lastrow)
 
         if settings["screws_offset"] == 'INSIDE':
-            # debugprint('Shift Inside')
+            # logger.debug('Shift Inside')
             shift_left_adjust = settings["wall_base_x_thickness"]
             shift_right_adjust = -settings["wall_base_x_thickness"] / 3
             shift_down_adjust = -settings["wall_base_y_thickness"] / 2
             shift_up_adjust = -settings["wall_base_y_thickness"] / 3
 
         elif settings["screws_offset"] == 'OUTSIDE':
-            debugprint('Shift Outside')
+            logger.debug('Shift Outside')
             shift_left_adjust = 0
             shift_right_adjust = settings["wall_base_x_thickness"] / 2
             shift_down_adjust = settings["wall_base_y_thickness"] * 2 / 3
             shift_up_adjust = settings["wall_base_y_thickness"] * 2 / 3
 
         else:
-            # debugprint('Shift Origin')
+            # logger.debug('Shift Origin')
             shift_left_adjust = 0
             shift_right_adjust = 0
             shift_down_adjust = 0
@@ -2068,7 +2057,7 @@ def make_dactyl(args):
 
 
     def wire_post(direction, offset):
-        debugprint('wire_post()')
+        logger.debug('wire_post()')
         s1 = helpers.box(
             settings["wire_post_diameter"], settings["wire_post_diameter"], settings["wire_post_height"]
         )
@@ -2262,7 +2251,7 @@ def make_dactyl(args):
                 if sizes[-1] > max_val:
                     inner_index = i_wire
                     max_val = sizes[-1]
-            debugprint(sizes)
+            logger.debug(sizes)
             inner_wire = base_wires[inner_index]
 
             # inner_plate = cq.Workplane('XY').add(cq.Face.makeFromWires(inner_wire))
