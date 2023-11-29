@@ -19,24 +19,22 @@ class DefaultCluster(object):
     thumb_plate_br_rotation = 0
     thumb_plate_bl_rotation = 0
 
-    @staticmethod
-    def name():
-        return "DEFAULT"
+    name = "DEFAULT"
 
 
     def get_config(self):
-        with open(os.path.join("src", "clusters", "json", "DEFAULT.json"), mode='r') as fid:
+        with open(os.path.join("src", "clusters", "json", f"{self.name}.json"), mode='r') as fid:
             data = json.load(fid)
         for item in data:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR " + str(item))
                 continue
             setattr(self, str(item), data[item])
         return data
 
     def __init__(self, settings: dict, helpers):
         self.get_config()
-        print(self.name(), " built")
+        print(f"{self.name} built")
         self.settings = settings
         self.helpers = helpers
 

@@ -3,10 +3,7 @@ import os
 import json
 
 class Minithicc3(MinidoxCluster):
-
-    @staticmethod
-    def name():
-        return "MINITHICC3"
+    name = "MINITHICC3"
 
     def __init__(self, settings, helpers):
         self.num_keys = 3

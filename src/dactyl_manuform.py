@@ -2393,27 +2393,27 @@ def make_dactyl(args):
             #             fname=path.join(save_path, config_name + r"_oled_clip_assy_test"))
 
     def get_cluster(style):
-        if style == CarbonfetCluster.name():
+        if style == CarbonfetCluster.name:
             clust = CarbonfetCluster(settings, helpers)
-        elif style == MiniCluster.name():
+        elif style == MiniCluster.name:
             clust = MiniCluster(settings, helpers)
-        elif style == MinidoxCluster.name():
+        elif style == MinidoxCluster.name:
             clust = MinidoxCluster(settings, helpers)
-        elif style == Minithicc.name():
+        elif style == Minithicc.name:
             clust = Minithicc(settings, helpers)
-        elif style == Minithicc3.name():
+        elif style == Minithicc3.name:
             clust = Minithicc3(settings, helpers)
-        elif style == TrackballOrbyl.name():
+        elif style == TrackballOrbyl.name:
             clust = TrackballOrbyl(settings, helpers)
-        elif style == TrackballWild.name():
+        elif style == TrackballWild.name:
             clust = TrackballWild(settings, helpers)
-        elif style == TrackballThree.name():
+        elif style == TrackballThree.name:
             clust = TrackballThree(settings, helpers)
-        elif style == TrackballBTU.name():
+        elif style == TrackballBTU.name:
             clust = TrackballBTU(settings, helpers)
-        elif style == TrackballCJ.name():
+        elif style == TrackballCJ.name:
             clust = TrackballCJ(settings, helpers)
-        elif style == CustomCluster.name():
+        elif style == CustomCluster.name:
             clust = CustomCluster(settings, helpers)
         else:
             clust = DefaultCluster(settings, helpers)

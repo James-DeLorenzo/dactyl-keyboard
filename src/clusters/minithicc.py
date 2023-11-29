@@ -4,9 +4,7 @@ import json
 
 class Minithicc(MinidoxCluster):
 
-    @staticmethod
-    def name():
-        return "MINITHICC"
+    name = "MINITHICC"
 
     def __init__(self, settings, helpers):
         self.num_keys = 4
@@ -26,7 +24,7 @@ class Minithicc(MinidoxCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

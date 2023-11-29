@@ -37,9 +37,7 @@ class TrackballWild(TrackballOrbyl):
         ]
     ]
 
-    @staticmethod
-    def name():
-        return "TRACKBALL_WILD"
+    name = "TRACKBALL_WILD"
 
 
     def get_config(self):
@@ -54,7 +52,7 @@ class TrackballWild(TrackballOrbyl):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

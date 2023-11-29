@@ -11,9 +11,7 @@ class TrackballBTU(TrackballWild):
             [-1, 15, 0]
         ]
 
-    @staticmethod
-    def name():
-        return "TRACKBALL_BTU"
+    name = "TRACKBALL_BTU"
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "TRACKBALL_WILD.json"), mode='r') as fid:
@@ -27,7 +25,7 @@ class TrackballBTU(TrackballWild):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

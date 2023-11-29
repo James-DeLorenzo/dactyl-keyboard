@@ -60,9 +60,7 @@ class TrackballOrbyl(DefaultCluster):
         ]
     ]
 
-    @staticmethod
-    def name():
-        return "TRACKBALL_ORBYL"
+    name = "TRACKBALL_ORBYL"
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "TRACKBALL_ORBYL.json"), mode='r') as fid:
@@ -76,7 +74,7 @@ class TrackballOrbyl(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

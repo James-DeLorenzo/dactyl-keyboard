@@ -4,13 +4,10 @@ import json
 import os
 
 class CarbonfetCluster(DefaultCluster):
-
-    @staticmethod
-    def name():
-        return "CARBONFET"
+    name = "CARBONFET"
 
     def get_config(self):
-        with open(os.path.join("src", "clusters", "json", "CARBONFET.json"), mode='r') as fid:
+        with open(os.path.join("src", "clusters", "json", f"{self.name}.json"), mode='r') as fid:
             data = json.load(fid)
 
         superdata = super().get_config()
@@ -21,7 +18,7 @@ class CarbonfetCluster(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 
@@ -107,7 +104,7 @@ class CarbonfetCluster(DefaultCluster):
 
     def thumb(self, side="right"):
         print('thumb()')
-        shape = self.thumb_1x_layout(self.helpers.single_plate(side=side))
+        shape = self.thumb_1x_layout(single_plate(side=side))
         shape = self.helpers.union([shape, self.thumb_15x_layout(self.helpers.double_plate_half(), plate=False)])
         shape = self.helpers.union([shape, self.thumb_15x_layout(self.helpers.single_plate(side=side))])
 

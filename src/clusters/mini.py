@@ -4,10 +4,7 @@ import os
 
 
 class MiniCluster(DefaultCluster):
-
-    @staticmethod
-    def name():
-        return "MINI"
+    name = "MINI"
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "MINI.json"), mode='r') as fid:
@@ -21,7 +18,7 @@ class MiniCluster(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

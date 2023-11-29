@@ -3,10 +3,7 @@ import json
 import os
 
 class CustomCluster(DefaultCluster):
-
-    @staticmethod
-    def name():
-        return "CUSTOM"
+    name = "CUSTOM"
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "CUSTOM.json"), mode='r') as fid:
@@ -20,7 +17,7 @@ class CustomCluster(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

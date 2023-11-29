@@ -60,9 +60,7 @@ class TrackballThree(DefaultCluster):
         ]
     ]
 
-    @staticmethod
-    def name():
-        return "TRACKBALL_THREE"
+    name = "TRACKBALL_THREE"
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "TRACKBALL_THREE.json"), mode='r') as fid:
@@ -76,7 +74,7 @@ class TrackballThree(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

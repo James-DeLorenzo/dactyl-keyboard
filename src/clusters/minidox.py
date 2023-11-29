@@ -6,9 +6,7 @@ import json
 class MinidoxCluster(DefaultCluster):
     minidox_Usize = 1.6
 
-    @staticmethod
-    def name():
-        return "MINIDOX"
+    name = "MINIDOX"
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "MINIDOX.json"), mode='r') as fid:
@@ -22,7 +20,7 @@ class MinidoxCluster(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                print(self.name() + ": NO MEMBER VARIABLE FOR " + str(item))
+                print(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 
