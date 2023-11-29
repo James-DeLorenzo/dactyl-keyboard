@@ -82,12 +82,12 @@ class TrackballThree(DefaultCluster):
 
         return superdata
 
-    def __init__(self, parent_locals):
+    def __init__(self, settings, helpers):
         self.num_keys = 4
         self.is_tb = True
-        super().__init__(parent_locals)
-        for item in parent_locals:
-            globals()[item] = parent_locals[item]
+        super().__init__(settings, helpers)
+        # self.settings = setting
+        self.helpers = helpers
 
     def position_rotation(self):
         rot = [10, -15, 5]

@@ -31,10 +31,10 @@ class TrackballCJ(TrackballOrbyl):
 
         return superdata
 
-    def __init__(self, parent_locals):
-        super().__init__(parent_locals)
-        for item in parent_locals:
-            globals()[item] = parent_locals[item]
+    def __init__(self, settings, helpers):
+        super().__init__(settings, helpers)
+        # self.settings = setting
+        self.helpers = helpers
 
     def position_rotation(self):
         pos = np.array([-15, -60, -12]) + self.thumborigin()

@@ -33,10 +33,10 @@ class TrackballBTU(TrackballWild):
 
         return superdata
 
-    def __init__(self, parent_locals):
-        super().__init__(parent_locals)
-        for item in parent_locals:
-            globals()[item] = parent_locals[item]
+    def __init__(self, settings, helpers):
+        super().__init__(settings, helpers)
+        # self.settings = setting
+        self.helpers = helpers
 
     def has_btus(self):
         return True

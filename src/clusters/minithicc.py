@@ -8,12 +8,11 @@ class Minithicc(MinidoxCluster):
     def name():
         return "MINITHICC"
 
-    def __init__(self, parent_locals):
+    def __init__(self, settings, helpers):
         self.num_keys = 4
-        super().__init__(parent_locals)
-        # have to repeat this for all classes/namespaces
-        for item in parent_locals:
-            globals()[item] = parent_locals[item]
+        super().__init__(settings, helpers)
+        # self.settings = setting
+        self.helpers = helpers
 
     def get_config(self):
         with open(os.path.join("src", "clusters", "json", "MINITHICC.json"), mode='r') as fid:
