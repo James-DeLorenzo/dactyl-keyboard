@@ -142,7 +142,7 @@ def make_dactyl(args):
                 logger.error(f"INCORRECT GIT BRANCH! Local is {local_branch} but config requires {data['branch']}.  Exiting.")
                 sys.exit(101)
     except Exception:
-        logger.warn("No 'branch' param found on config.")
+        logger.warning("No 'branch' param found on config.")
 
     settings.update(data)
 
@@ -160,7 +160,7 @@ def make_dactyl(args):
     try:
         logger.info(f'Found Current Engine in Config = {ENGINE}')
     except Exception:
-        logger.warn('Engine Not Found in Config')
+        logger.warning('Engine Not Found in Config')
         ENGINE = 'solid'
         # ENGINE = 'cadquery'
         logger.info(f'Setting Current Engine = {ENGINE}')
@@ -1466,12 +1466,12 @@ def make_dactyl(args):
         helper.export_file(shape=mod_r, fname=path.join(save_path, r_config_name + r"_right"))
 
         if settings["right_side_only"]:
-            logger.warn(">>>>>  RIGHT SIDE ONLY: Only rendering a the right side.")
+            logger.warning(">>>>>  RIGHT SIDE ONLY: Only rendering a the right side.")
             return
         base = baseplate(walls_r, side='right')
         helper.export_file(shape=base, fname=path.join(save_path, r_config_name + r"_right_plate"))
         if quickly:
-            logger.warn(">>>>>  QUICK RENDER: Only rendering a the right side and bottom plate.")
+            logger.warning(">>>>>  QUICK RENDER: Only rendering a the right side and bottom plate.")
             return
         helper.export_dxf(shape=base, fname=path.join(save_path, r_config_name + r"_right_plate"))
 

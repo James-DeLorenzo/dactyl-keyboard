@@ -22,7 +22,7 @@ class CarbonfetCluster(DefaultCluster):
 
         for item in superdata:
             if not hasattr(self, str(item)):
-                logger.warn(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
+                logger.warning(f"{self.name}: NO MEMBER VARIABLE FOR {str(item)}")
                 continue
             setattr(self, str(item), superdata[item])
 

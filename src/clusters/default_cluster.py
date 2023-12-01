@@ -32,8 +32,8 @@ class DefaultCluster(object):
             data = json.load(fid)
         for item in data:
             if not hasattr(self, str(item)):
-                logger.warn(f"{self.name}: NO MEMBER VARIABLE FOR " + str(item))
                 continue
+            logger.warning(f"{self.name}: NO MEMBER VARIABLE FOR " + str(item))
             setattr(self, str(item), data[item])
         return data
 
@@ -50,6 +50,7 @@ class DefaultCluster(object):
         # debugprint('thumborigin()')
         origin = self.capbuilder.key_position([self.settings["mount_width"] / 2, -(self.settings["mount_height"] / 2), 0], 1, self.settings["cornerrow"])
         _thumb_offsets = self.thumb_offsets.copy()
+        _thumb_offsets = [a + b for a,b in zip(_thumb_offsets, self.settings["thumb_offsets"])]
         if self.settings["shift_column"] != 0:
             _thumb_offsets[0] = self.thumb_offsets[0] + (self.settings["shift_column"] * (self.settings["mount_width"] + 6))
             # if shift_column < 0:  # raise cluster up when moving inward
@@ -58,8 +59,7 @@ class DefaultCluster(object):
             #     if shift_column <= -2:
             #         # y = shift_column * 15
             #         _thumb_offsets[1] = self.thumb_offsets[1] - (shift_column * 15)
-        for i in range(len(origin)):
-            origin[i] = origin[i] + _thumb_offsets[i]
+        origin = [a + b for a,b in zip(origin, _thumb_offsets)]
 
         return origin
 
