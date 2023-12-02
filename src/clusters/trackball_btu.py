@@ -1,6 +1,9 @@
 from clusters.trackball_wilder import TrackballWild
 import json
 import os
+import logging
+
+logger = logging.getLogger()
 
 class TrackballBTU(TrackballWild):
 
@@ -31,10 +34,11 @@ class TrackballBTU(TrackballWild):
 
         return superdata
 
-    def __init__(self, settings, helpers):
-        super().__init__(settings, helpers)
-        # self.settings = setting
-        self.helpers = helpers
+    def __init__(self, *args, **kwargs):
+        logger.debug(args)
+        logger.debug(kwargs)
+        super().__init__(*args, **kwargs)
+        self.super = super()
 
     def has_btus(self):
         return True
@@ -43,20 +47,20 @@ class TrackballBTU(TrackballWild):
         posts = [shape]
         all_pos = []
         for i in range(len(pos)):
-            all_pos.append(pos[i] + tb_socket_translation_offset[i])
+            all_pos.append(pos[i] + self.settings["tb_socket_translation_offset"][i])
         z_pos = abs(pos[2])
         for post_offset in self.post_offsets:
             support_z = z_pos + post_offset[2]
             new_offsets = post_offset.copy()
             new_offsets[2] = -z_pos
-            support = cylinder(1.5, support_z, 10)
-            support = translate(support, all_pos)
-            support = translate(support, new_offsets)
-            base = cylinder(4, 1, 10)
+            support = self.helper.cylinder(1.5, support_z, 10)
+            support = self.helper.translate(support, all_pos)
+            support = self.helper.translate(support, new_offsets)
+            base = self.helper.cylinder(4, 1, 10)
             new_offsets[2] = 0.5 - all_pos[2]
-            base = translate(base, all_pos)
-            base = translate(base, new_offsets)
+            base = self.helper.translate(base, all_pos)
+            base = self.helper.translate(base, new_offsets)
             posts.append(base)
-            support = union([support, base])
+            support = self.helper.union([support, base])
             posts.append(support)
-        return union(posts)
+        return self.helper.union(posts)
